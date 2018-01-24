@@ -1,0 +1,17 @@
+FTP protocol
+connect to server PI with IP through 21 socket
+return 220 to client
+pass USER username to server PI
+return 331 to client
+pass PASS password to server PI
+return 230 to client
+
+pass PASV to server PI (passive mode)
+return 227 to client with parameters (A,B,C,D,a,b)
+connect to server DTP using A.B.C.D IP : ((a << 8) | b)
+send LIST/RETR command to server PI
+return 150 to client
+close server DTP for client
+server PI returns 226
+client passes QUIT to server PI
+return 221 to client
