@@ -96,28 +96,35 @@ int main(int argc , char *argv[])
 {
     int sockpi;
     std::string strReply;
-    
+    std::string::size_type sz;
+
     //TODO  arg[1] can be a dns or an IP address.
+    argv[1] = "130.179.16.134";
     if (argc > 2)
         sockpi = create_connection(argv[1], atoi(argv[2]));
     if (argc == 2)
         sockpi = create_connection(argv[1], 21);
     else
-        sockpi = create_connection("130.179.16.134", 21);
+        sockpi = create_connection(argv[1], 21);
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
     
-    
-    strReply = request_reply(sockpi, "USER anonymous\r\n");
-    //TODO parse srtReply to obtain the status. 
-	// Let the system act according to the status and display
-    // friendly message to the user 
-	// You can see the ouput using std::cout << strReply  << std::endl;
-    
-    
-    strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
-        
-    //TODO implement PASV, LIST, RETR. 
-    // Hint: implement a function that set the SP in passive mode and accept commands.
+    if(status == 331) {
+        strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
+        status = std::stoi(strReply.substr(0,3), &sz);
+
+        std::cout << strReply << std::endl;
+
+        if(status == 230) {
+
+        }else {
+
+        }
+        //TODO implement PASV, LIST, RETR.
+        // Hint: implement a function that set the SP in passive mode and accept commands.
+    }
+    else {
+    	std::cout << "Invalid User" << std::endl;
+    }
     return 0;
 }
