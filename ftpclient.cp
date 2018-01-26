@@ -31,6 +31,13 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 #define BUFFER_LENGTH 2048
 #define WAITING_TIME 1000
 
+const int connectID = 220;
+const int userID = 331;
+const int passID = 230;
+const int pasvID = 227;
+const int listrtID = 150;
+const int quitID = 221;
+
 int create_connection(std::string host, int port)
 {
     int s;
