@@ -38,6 +38,11 @@ const int pasvID = 227;
 const int listrtID = 150;
 const int quitID = 221;
 
+int change_to_passive(char *argv[], int port_one, int port_two) {
+    int passiveID;
+    return passiveID;
+}
+
 int create_connection(std::string host, int port)
 {
     int s;
@@ -105,7 +110,6 @@ int main(int argc , char *argv[])
     std::string strReply;
     std::string::size_type sz;
 
-    //TODO  arg[1] can be a dns or an IP address.
     argv[1] = "130.179.16.134";
     if (argc > 2)
         sockpi = create_connection(argv[1], atoi(argv[2]));
@@ -123,12 +127,11 @@ int main(int argc , char *argv[])
         std::cout << strReply << std::endl;
 
         if(status == 230) {
-
+            //TODO implement PASV, LIST, RETR.
+            // Hint: implement a function that set the SP in passive mode and accept commands.
         }else {
-
+            std::cout << "Invalid Password" << std::endl;
         }
-        //TODO implement PASV, LIST, RETR.
-        // Hint: implement a function that set the SP in passive mode and accept commands.
     }
     else {
     	std::cout << "Invalid User" << std::endl;
