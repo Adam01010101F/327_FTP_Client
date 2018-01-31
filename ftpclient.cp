@@ -42,8 +42,10 @@ int change_to_passive(char *argv[], int port_one, int port_two) {
     int passiveID = 0;
     //server DTP listens to data port
     //wait for connection
-    if(create_connection(argv[1], port_one))
-    	passiveID = pasvID;
+    port_one <<= 8;
+    //int concat_port = Integer.valueOf(String.valueOf(port_one) + String.valueOf(port_two));
+    //if(create_connection(argv[1], concat_port))
+    //	passiveID = pasvID;
     return passiveID;
 }
 
