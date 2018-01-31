@@ -29,7 +29,7 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 #include <netdb.h>
 
 #define BUFFER_LENGTH 2048
-#define WAITING_TIME 1000
+#define WAITING_TIME 150000
 
 const int connectID = 220;
 const int userID = 331;
@@ -107,6 +107,7 @@ std::string request_reply(int s, std::string message)
 int main(int argc , char *argv[])
 {
     int sockpi;
+    int status = 0;
     std::string strReply;
     std::string::size_type sz;
 
@@ -120,6 +121,10 @@ int main(int argc , char *argv[])
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
     
+    strReply = request_reply(sockpi, "USER anonymous\r\n");
+    status = std::stoi(strReply.substr(0,3), &sz);
+    std::cout << strReply << std::endl;
+
     if(status == 331) {
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         status = std::stoi(strReply.substr(0,3), &sz);
