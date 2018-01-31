@@ -139,8 +139,19 @@ int main(int argc , char *argv[])
 
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
-            int pid = change_to_passive(&argv[1],21,21);
             // Hint: implement a function that set the SP in passive mode and accept commands.
+            int pid = change_to_passive(&argv[1],21,21);
+            if(pid==227){
+                while(quit==0){
+                    std::cout<<"Enter a command(LIST, RETRV, QUIT)"<<std::endl;
+                    std::cin>>uReq;
+                    //switch(uReq(
+                    //case LIST
+                    //case RETRV)
+                    //case QUIT
+                    //DEFAULT: ERROR
+                }
+            }
         }else {
             std::cout << "Invalid Password" << std::endl;
         }
