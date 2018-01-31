@@ -117,13 +117,13 @@ int main(int argc , char *argv[])
     std::string strReply;
     std::string::size_type sz;
 
-    argv[1] = "130.179.16.134";
+    //TODO  arg[1] can be a dns or an IP address.
     if (argc > 2)
         sockpi = create_connection(argv[1], atoi(argv[2]));
     if (argc == 2)
         sockpi = create_connection(argv[1], 21);
     else
-        sockpi = create_connection(argv[1], 21);
+        sockpi = create_connection("130.179.16.134", 21);
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
     
