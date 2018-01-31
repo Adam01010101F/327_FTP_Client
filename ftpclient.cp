@@ -128,6 +128,7 @@ int main(int argc , char *argv[])
 
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
+            int pid = change_to_passive(&argv[1],21,21);
             // Hint: implement a function that set the SP in passive mode and accept commands.
         }else {
             std::cout << "Invalid Password" << std::endl;
