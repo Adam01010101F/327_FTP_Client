@@ -39,7 +39,11 @@ const int listrtID = 150;
 const int quitID = 221;
 
 int change_to_passive(char *argv[], int port_one, int port_two) {
-    int passiveID;
+    int passiveID = 0;
+    //server DTP listens to data port
+    //wait for connection
+    if(create_connection(argv[1], port_one))
+    	passiveID = pasvID;
     return passiveID;
 }
 
