@@ -160,7 +160,7 @@ int main(int argc , char *argv[])
 
             if(pid==227){   //Entered Passive Mode
                 while(quit==0){
-                    std::cout<<"Enter a command(LIST, RETRV, QUIT)"<<std::endl;
+                    std::cout<<"Enter a command(LIST, RETR *filename*, QUIT)"<<std::endl;
                     std::cin>>uReq;
                     switch(toupper(uReq)){
                     case LIST:
@@ -169,7 +169,7 @@ int main(int argc , char *argv[])
                         std::cout<<strReply<<std::endl;
                         break;
                     case RETRV:
-                        strReply = request_reply(sockpi, "RETRV\r\n");
+                        strReply = request_reply(sockpi, uReq+"\r\n");
                         status = std::stoi(strReply.substr((0,3), $sz);
                         break;
                     case QUIT:
