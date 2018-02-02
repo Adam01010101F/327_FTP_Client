@@ -123,8 +123,8 @@ int change_to_passive(char *argv[], int port_one, int port_two) {
 int main(int argc , char *argv[])
 {
     int sockpi;
-    int status = 0;
-    std::string strReply;
+    int quit, status = 0;
+    std::string strReply, uReq;
     std::string::size_type sz;
 
     //TODO  arg[1] can be a dns or an IP address.
