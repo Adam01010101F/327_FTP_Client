@@ -129,15 +129,17 @@ int main(int argc , char *argv[])
     else
         sockpi = create_connection("130.179.16.134", 21);
     
-    // Seek a response code from server and then print the response
+    // Seek a response code from server and then print the response (220 success code desired)
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
     
-    // 
+    // Send user info to the server and print out the response
     strReply = request_reply(sockpi, "USER anonymous\r\n");
+    // Isolates the status code from the rest of the message 
     status = std::stoi(strReply.substr(0,3), &sz);
     std::cout << strReply << std::endl;
 
+    // If user is valid, if status code
     if(status == 331) {
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         status = std::stoi(strReply.substr(0,3), &sz);
