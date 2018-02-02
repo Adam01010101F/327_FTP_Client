@@ -27,7 +27,7 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 #include <sys/types.h>
 #include <unistd.h>
 #include <netdb.h>
-
+#include <sstream>
 #define BUFFER_LENGTH 2048
 #define WAITING_TIME 150000
 
@@ -37,17 +37,6 @@ const int passID = 230;
 const int pasvID = 227;
 const int listrtID = 150;
 const int quitID = 221;
-
-int change_to_passive(char *argv[], int port_one, int port_two) {
-    int passiveID = 0;
-    //server DTP listens to data port
-    //wait for connection
-    port_one <<= 8;
-    //int concat_port = Integer.valueOf(String.valueOf(port_one) + String.valueOf(port_two));
-    //if(create_connection(argv[1], concat_port))
-    //	passiveID = pasvID;
-    return passiveID;
-}
 
 int create_connection(std::string host, int port)
 {
@@ -109,6 +98,27 @@ std::string request_reply(int s, std::string message)
 	return "";
 }
 
+int change_to_passive(char *argv[], int port_one, int port_two) {
+    int passiveID, result = 0;
+    std::string temp;
+    //server DTP listens to data port
+    //wait for connection
+
+    //left shift port one by 8 bits
+    port_one <<= 8;
+
+    //concatenate port one and port two
+    std::ostringstream concat;
+    concat << port_one << port_two;
+    temp = concat.str();
+    std::stringstream convert(temp);
+    convert >> result;
+
+    //test connection
+    if(create_connection(argv[1], result))
+    	passiveID = pasvID;
+    return passiveID;
+}
 
 int main(int argc , char *argv[])
 {
@@ -118,28 +128,19 @@ int main(int argc , char *argv[])
     std::string::size_type sz;
 
     //TODO  arg[1] can be a dns or an IP address.
-    
-    // If the argument count is greater than two: pass IP and Port to connect...
     if (argc > 2)
         sockpi = create_connection(argv[1], atoi(argv[2]));
-    // If the argument count is exactly two pass IP and default Port to connect...
     if (argc == 2)
         sockpi = create_connection(argv[1], 21);
-    // If the user enters no arguments, pass a defualt IP and Port to connect...
     else
         sockpi = create_connection("130.179.16.134", 21);
-    
-    // Seek a response code from server and then print the response (220 success code desired)
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
     
-    // Send user info to the server and print out the response
     strReply = request_reply(sockpi, "USER anonymous\r\n");
-    // Isolates the status code from the rest of the message 
     status = std::stoi(strReply.substr(0,3), &sz);
     std::cout << strReply << std::endl;
 
-    // If user is valid, if status code
     if(status == 331) {
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         status = std::stoi(strReply.substr(0,3), &sz);
