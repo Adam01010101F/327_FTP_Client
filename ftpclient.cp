@@ -151,13 +151,13 @@ int main(int argc , char *argv[])
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         // Isolate status code from rest of message
         status = std::stoi(strReply.substr(0,3), &sz);
-
         std::cout << strReply << std::endl;
-
+        // If the password was good
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
             int pid = change_to_passive(&argv[1],21,21);
+
             if(pid==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"Enter a command(LIST, RETRV, QUIT)"<<std::endl;
@@ -182,6 +182,7 @@ int main(int argc , char *argv[])
                     }
                 }
             }
+
         }else {
             std::cout << "Invalid Password" << std::endl;
         }
