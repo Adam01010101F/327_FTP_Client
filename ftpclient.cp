@@ -151,15 +151,28 @@ int main(int argc , char *argv[])
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
             int pid = change_to_passive(&argv[1],21,21);
-            if(pid==227){
+            if(pid==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"Enter a command(LIST, RETRV, QUIT)"<<std::endl;
                     std::cin>>uReq;
-                    //switch(uReq(
-                    //case LIST
-                    //case RETRV)
-                    //case QUIT
-                    //DEFAULT: ERROR
+                    switch(toupper(uReq)){
+                    case LIST:
+                        strReply = request_reply(sockpi, "LIST\r\n");
+                        status = std::stoi(strReply.substr((0,3), $sz);
+                        std::cout<<strReply<<std::endl;
+                        break;
+                    case RETRV:
+                        strReply = request_reply(sockpi, "RETRV\r\n");
+                        status = std::stoi(strReply.substr((0,3), $sz);
+                        break;
+                    case QUIT:
+                        quit=1;
+                        break;
+                    DEFAULT:
+                        std::cout<<"Invalid input. Try again.\n"
+                        cin>>uReq;
+                        break;
+                    }
                 }
             }
         }else {
