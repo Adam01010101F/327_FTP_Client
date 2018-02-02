@@ -118,15 +118,22 @@ int main(int argc , char *argv[])
     std::string::size_type sz;
 
     //TODO  arg[1] can be a dns or an IP address.
+    
+    // If the argument count is greater than two: pass IP and Port to connect...
     if (argc > 2)
         sockpi = create_connection(argv[1], atoi(argv[2]));
+    // If the argument count is exactly two pass IP and default Port to connect...
     if (argc == 2)
         sockpi = create_connection(argv[1], 21);
+    // If the user enters no arguments, pass a defualt IP and Port to connect...
     else
         sockpi = create_connection("130.179.16.134", 21);
+    
+    // Seek a response code from server and then print the response
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
     
+    // 
     strReply = request_reply(sockpi, "USER anonymous\r\n");
     status = std::stoi(strReply.substr(0,3), &sz);
     std::cout << strReply << std::endl;
