@@ -113,18 +113,18 @@ int change_to_passive(char *argv[], int port_one, int port_two) {
     temp = concat.str();
     std::stringstream convert(temp);
     convert >> result;
-
+    
     //test connection
     if(create_connection(argv[1], result))
-    	passiveID = pasvID;
-    return passiveID;
+        return pasvID;
+    return pasvID;
 }
 
 int main(int argc , char *argv[])
 {
     int sockpi;
-    int quit, status = 0;
-    std::string strReply, uReq;
+    int quit, uReq, status = 0;
+    std::string strReply; 
     std::string::size_type sz;
 
     //TODO  arg[1] can be a dns or an IP address.
@@ -156,31 +156,35 @@ int main(int argc , char *argv[])
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
+            
             int pid = change_to_passive(&argv[1],21,21);
-
             if(pid==227){   //Entered Passive Mode
                 while(quit==0){
-                    std::cout<<"Enter a command(LIST, RETR *filename*, QUIT)"<<std::endl;
+                    std::cout<<"\t\t\tMAIN MENU\n"
+                             <<"1. List Files\n2. Retrieve a File\n3. Quit\n"
+                             <<"Enter Number: ";
                     std::cin>>uReq;
-                    switch(toupper(uReq)){
-                    case LIST:
+                    switch(uReq){
+                    case 1:
                         strReply = request_reply(sockpi, "LIST\r\n");
-                        status = std::stoi(strReply.substr((0,3), $sz);
+                        status = std::stoi(strReply.substr(0,3), &sz);
                         std::cout<<strReply<<std::endl;
                         break;
-                    case RETRV:
+                    case 2:
                         strReply = request_reply(sockpi, uReq+"\r\n");
-                        status = std::stoi(strReply.substr((0,3), $sz);
+                        status = std::stoi(strReply.substr(0,3), &sz);
                         break;
-                    case QUIT:
+                    case 3:
                         quit=1;
                         break;
                     DEFAULT:
-                        std::cout<<"Invalid input. Try again.\n"
-                        cin>>uReq;
+                        std::cout<<"Invalid input. Try again.\n";
+                        std::cin>>uReq;
                         break;
                     }
                 }
+            }else{
+                std::cout<<"Connnection Failed."<<std::endl;
             }
 
         }else {
