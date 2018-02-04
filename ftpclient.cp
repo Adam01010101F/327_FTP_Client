@@ -17,6 +17,7 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 ...
 */
 #include <iostream>    //cout
+#include <cstdlib>
 #include <string>
 #include <stdio.h> //printf
 #include <stdlib.h>
@@ -98,9 +99,17 @@ std::string request_reply(int s, std::string message)
 	return "";
 }
 
-int change_to_passive(char *argv[], int port_one, int port_two) {
-    int passiveID, result = 0;
+int change_to_passive(std::string strReply, int port_one, int port_two) {
+    int passiveID=0,changes=0, result = 0;
     std::string temp;
+    size_t pos;
+    do{
+        
+        if(pos!=std::string::npos){
+            changes++;
+            strReply.replace(pos, std::string(",").length(), ".");
+        }
+    }while(pos!=std::string::npos); //While(it finds a hit)
     //server DTP listens to data port
     //wait for connection
 
@@ -114,10 +123,13 @@ int change_to_passive(char *argv[], int port_one, int port_two) {
     std::stringstream convert(temp);
     convert >> result;
     
+    std::cout<< "Entering CTP MODE\nport_one:"<<port_one<<std::endl
+        <<"port_two;"<<port_two<<std::endl
+        <<"result:"<<result<<std::endl;
     //test connection
-    if(create_connection(argv[1], result))
-        return pasvID;
-    return pasvID;
+    //if(create_connection(argv[1], result))
+    //    return pasvID;
+    return result;
 }
 
 int main(int argc , char *argv[])
@@ -135,8 +147,10 @@ int main(int argc , char *argv[])
     if (argc == 2)
         sockpi = create_connection(argv[1], 21);
     // If the user enters no arguments, pass a defualt IP and Port to connect...
-    else
-        sockpi = create_connection("130.179.16.134", 21);
+    else{
+        argv[1] = "130.179.16.134";
+        sockpi = create_connection(argv[1], 21);
+    }
     // Seek a response code from server and then print the response (220 success code desired)
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
@@ -156,9 +170,14 @@ int main(int argc , char *argv[])
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
+            strReply = request_reply(sockpi, "PASV\r\n");
+            status = std::stoi(strReply.substr(0,3), &sz);
             
-            int pid = change_to_passive(&argv[1],21,21);
-            if(pid==227){   //Entered Passive Mode
+            
+            int port = change_to_passive(strReply,21,21);            //A bit hacky??
+            //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
+            //std::cout<<dtpIP;
+            if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
                              <<"1. List Files\n2. Retrieve a File\n3. Quit\n"
