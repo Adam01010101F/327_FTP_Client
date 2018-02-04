@@ -1,0 +1,13 @@
+std::string strReply
+std::string tgStr="'"
+std::string repStr
+
+do{
+    pos = strReply.find(tgStr);               //find first position of target string in prompt
+    if(pos!=std::string::npos){             //If 
+        changes++;
+        prompt.replace(pos, tgStr.length(), repStr);             
+    }
+    else if(pos==std::string::npos && changes<1){
+        std::cout<<"String DNE\n";
+}while(pos!=std::string::npos);     //while(it finds something)
