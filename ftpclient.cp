@@ -196,7 +196,7 @@ int main(int argc , char *argv[])
                     case 3:
                         quit=1;
                         break;
-                    DEFAULT:
+                    default:
                         std::cout<<"Invalid input. Try again.\n";
                         std::cin>>uReq;
                         break;
