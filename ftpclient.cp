@@ -17,6 +17,7 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 ...
 */
 #include <iostream>    //cout
+#include <cstdlib>
 #include <string>
 #include <stdio.h> //printf
 #include <stdlib.h>
@@ -98,9 +99,19 @@ std::string request_reply(int s, std::string message)
 	return "";
 }
 
-int change_to_passive(char *argv[], int port_one, int port_two) {
-    int passiveID, result = 0;
+int change_to_passive(std::string strReply, int port_one, int port_two) {
+    int passiveID=0,changes=0, result = 0;
     std::string temp;
+    size_t pos;
+    
+
+    do{
+        
+        if(pos!=std::string::npos){
+            changes++;
+            strReply.replace(pos, std::string(",").length(), ".");
+        }
+    }while(pos!=std::string::npos); //While(it finds a hit)
     //server DTP listens to data port
     //wait for connection
 
@@ -114,18 +125,38 @@ int change_to_passive(char *argv[], int port_one, int port_two) {
     std::stringstream convert(temp);
     convert >> result;
     
+    std::cout<< "Entering CTP MODE\nport_one:"<<port_one<<std::endl
+        <<"port_two;"<<port_two<<std::endl
+        <<"result:"<<result<<std::endl;
     //test connection
-    if(create_connection(argv[1], result))
-        return pasvID;
-    return pasvID;
+    //if(create_connection(argv[1], result))
+    //    return pasvID;
+    return result;
+
+    /* Pass the response retrieved from Server PI after entering PASV
+     Response would be parsed and the following would be used
+     1. New IP Address
+     2. (2) ports that need to concatenate
+
+     Then use the new ip address to create a new connection
+     this will give us a new sockPI
+     
+     At this point we will likely request from the orignial socket // request(orig_socket, ...)
+     and recieve a reply from the new socket // reply(new_socket, ...)
+
+     */
 }
 
 int main(int argc , char *argv[])
 {
     int sockpi;
+    // This should be changed, make them one for each var
     int quit, uReq, status = 0;
     std::string strReply; 
     std::string::size_type sz;
+
+    std::string default_ip = "130.179.16.134";
+    int default_port = 21;
 
     //TODO  arg[1] can be a dns or an IP address.
     // If the argument count is greater than two: pass IP and Port to connect...
@@ -135,8 +166,10 @@ int main(int argc , char *argv[])
     if (argc == 2)
         sockpi = create_connection(argv[1], 21);
     // If the user enters no arguments, pass a defualt IP and Port to connect...
-    else
-        sockpi = create_connection("130.179.16.134", 21);
+    else{
+        
+        sockpi = create_connection(default_ip, default_port);
+    }
     // Seek a response code from server and then print the response (220 success code desired)
     strReply = reply(sockpi);
     std::cout << strReply  << std::endl;
@@ -156,16 +189,16 @@ int main(int argc , char *argv[])
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
-            
-        	//strReply = request_reply(sockpi, "PASV\r\n");
-        	//status would be to get ID, IP address and port number
-        	//pass status to change passive method
-        	//parse IP and port
-        	//attempt to create connection
-        	//if successful, return 227
+            strReply = request_reply(sockpi, "PASV\r\n");
+            status = std::stoi(strReply.substr(0,3));
 
-            int pid = change_to_passive(&argv[1],21,21);
-            if(pid==227){   //Entered Passive Mode
+            std::cout << "Before Comment" << std::endl;
+            //int sock_dtp = change_to_passive(strReply,21,21);            //A bit hacky??
+            std::cout << "After Comment" << std::endl;
+
+            //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
+            //std::cout<<dtpIP;
+            if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
                              <<"1. List Files\n2. Retrieve a File\n3. Quit\n"
@@ -173,11 +206,13 @@ int main(int argc , char *argv[])
 
                     // uReq starts with RETR
                     std::cin>>uReq;
+
                     switch(uReq){
                     case 1:
-                        strReply = request_reply(sockpi, "LIST\r\n");
-                        status = std::stoi(strReply.substr(0,3), &sz);
-                        std::cout<<strReply<<std::endl;
+
+                        // strReply = request_reply(sockpi, "LIST\r\n");
+                        // status = std::stoi(strReply.substr(0,3), &sz);
+                        // std::cout<<strReply<<std::endl;
                         break;
                     case 2:
                         strReply = request_reply(sockpi, uReq+"\r\n");
@@ -187,6 +222,7 @@ int main(int argc , char *argv[])
                         quit=1;
                         break;
                     default:
+
                         std::cout<<"Invalid input. Try again.\n";
                         std::cin>>uReq;
                         break;
