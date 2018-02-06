@@ -171,10 +171,10 @@ int main(int argc , char *argv[])
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
             strReply = request_reply(sockpi, "PASV\r\n");
-            status = std::stoi(strReply.substr(0,3), &sz);
+            status = std::stoi(strReply.substr(0,3));
             
             
-            int port = change_to_passive(strReply,21,21);            //A bit hacky??
+            //int port = change_to_passive(strReply,21,21);            //A bit hacky??
             //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
             //std::cout<<dtpIP;
             if(status==227){   //Entered Passive Mode
