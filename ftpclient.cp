@@ -157,12 +157,21 @@ int main(int argc , char *argv[])
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
             
+        	//strReply = request_reply(sockpi, "PASV\r\n");
+        	//status would be to get ID, IP address and port number
+        	//pass status to change passive method
+        	//parse IP and port
+        	//attempt to create connection
+        	//if successful, return 227
+
             int pid = change_to_passive(&argv[1],21,21);
             if(pid==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
                              <<"1. List Files\n2. Retrieve a File\n3. Quit\n"
                              <<"Enter Number: ";
+
+                    // uReq starts with RETR
                     std::cin>>uReq;
                     switch(uReq){
                     case 1:
