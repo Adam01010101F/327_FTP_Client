@@ -102,6 +102,7 @@ bool isDone(std::string sockPI){
     
 }
 
+<<<<<<< HEAD
 int change_to_passive(std::string strReply, int port_one, int port_two) {
     int passiveID=0,changes=0, result = 0;
     std::string temp;
@@ -135,6 +136,34 @@ int change_to_passive(std::string strReply, int port_one, int port_two) {
     //if(create_connection(argv[1], result))
     //    return pasvID;
     return result;
+=======
+int change_to_passive(std::string message) {
+    std::cout << message << std::endl;
+
+    int ipStartPosition = message.find("(")+1;
+    int ipEndPosition = message.find(")");
+
+    std::string strReply = message.substr(ipStartPosition, ipEndPosition-ipStartPosition);
+
+    std::string currentChar;
+
+    //std::cout << strReply << std::endl;
+
+    int a1,a2,a3,a4,p1,p2;
+    sscanf(strReply.c_str(), "%d,%d,%d,%d,%d,%d", &a1, &a2, &a3, &a4, &p1, &p2);
+    //printf("This is the ip address: %d.%d.%d.%d Here is port 1: %d and here is port 2: %d\n", a1,a2,a3,a4,p1,p2);
+
+    std::string ip_server_dtp = std::to_string(a1) + "." + std::to_string(a2) + "." + std::to_string(a3) + "." + std::to_string(a4);
+
+    // std::string port1 = std::to_string(p1);
+    // std::string port2 = std::to_string(p2);
+
+    printf("IP Address: %s\n", ip_server_dtp.c_str());
+
+    printf("Port 1: %d\n", p1);
+    printf("Port 2: %d\n", p2);
+
+>>>>>>> origin/isaac-work-branch
 
     /* Pass the response retrieved from Server PI after entering PASV
      Response would be parsed and the following would be used
@@ -148,6 +177,7 @@ int change_to_passive(std::string strReply, int port_one, int port_two) {
      and recieve a reply from the new socket // reply(new_socket, ...)
 
      */
+<<<<<<< HEAD
 }
 void downloadFile(int sock_dtp, std::string fileName)
 {
@@ -211,11 +241,34 @@ int main(int argc , char *argv[])
 
             //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
             //std::cout<<dtpIP;
+            
+            std::cout << strReply << std::endl;
+            //printf("This is the string reply: %s\n", strReply.c_str());
+
+            // int sts;
+            // std::string msg;
+            // sscanf(strReply.c_str(), "%d-%s", &sts, &msg);
+            // printf("Status message: %d\n", sts);
+            status = std::stoi(strReply.substr(0,3));
+            std::cout << "status" << std::endl;  
+
+            //std::cout << "Before Comment" << std::endl;
+            int sock_dtp = change_to_passive(strReply);            //A bit hacky??
+            //std::cout << "After Comment" << std::endl;
+
+            //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
+            //std::cout<<dtpIP;
+            
             if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
                              <<"1. List Files\n2. Retrieve a File\n3. Quit\n"
                              <<"Enter Number: ";
+                             <<"1. List Files\n"
+                             <<"2. Retrieve a File\n"
+                             <<"3. Quit\n"
+                             <<"Make selection: ";
+
                     std::cin>>uReq;
 
                     switch(uReq){
