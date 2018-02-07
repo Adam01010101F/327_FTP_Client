@@ -98,6 +98,9 @@ std::string request_reply(int s, std::string message)
 	}
 	return "";
 }
+bool isDone(std::string sockPI){
+    
+}
 
 int change_to_passive(std::string strReply, int port_one, int port_two) {
     int passiveID=0,changes=0, result = 0;
@@ -148,9 +151,11 @@ int change_to_passive(std::string strReply, int port_one, int port_two) {
 }
 void downloadFile(int sock_dtp, std::string fileName)
 {
-
-    FILE * file = fopen("filename", "r");
-    
+    FILE * file = fopen(fileName.c_str(), "w");
+    do{
+        fputs(reply(sock_dtp), file);
+    }while(!feof(file));
+    fclose(file);
 }
 
 
@@ -234,10 +239,13 @@ int main(int argc , char *argv[])
                         }
                         break;
                     case 3:
-                        quit=1;
+                        strReply = request_reply(sockpi, "QUIT\r\n");
+                        status = std::stoi(strReply.substr(0,3), &sz);
+                        if(status == 221)
+                            quit=1;
                         break;
                     default:
-
+                        
                         std::cout<<"Invalid input. Try again.\n";
                         std::cin>>uReq;
                         break;
