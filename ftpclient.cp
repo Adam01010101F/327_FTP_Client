@@ -102,43 +102,10 @@ bool isDone(std::string sockPI){
     
 }
 
-<<<<<<< HEAD
-int change_to_passive(std::string strReply, int port_one, int port_two) {
-    int passiveID=0,changes=0, result = 0;
+int change_to_passive(std::string message) {
+    int passiveID=0, changes=0, result = 0;
     std::string temp;
     size_t pos;
-    
-
-    do{
-        
-        if(pos!=std::string::npos){
-            changes++;
-            strReply.replace(pos, std::string(",").length(), ".");
-        }
-    }while(pos!=std::string::npos); //While(it finds a hit)
-    //server DTP listens to data port
-    //wait for connection
-
-    //left shift port one by 8 bits
-    port_one <<= 8;
-
-    //concatenate port one and port two
-    std::ostringstream concat;
-    concat << port_one << port_two;
-    temp = concat.str();
-    std::stringstream convert(temp);
-    convert >> result;
-    
-    std::cout<< "Entering CTP MODE\nport_one:"<<port_one<<std::endl
-        <<"port_two;"<<port_two<<std::endl
-        <<"result:"<<result<<std::endl;
-    //test connection
-    //if(create_connection(argv[1], result))
-    //    return pasvID;
-    return result;
-=======
-int change_to_passive(std::string message) {
-    std::cout << message << std::endl;
 
     int ipStartPosition = message.find("(")+1;
     int ipEndPosition = message.find(")");
@@ -146,8 +113,6 @@ int change_to_passive(std::string message) {
     std::string strReply = message.substr(ipStartPosition, ipEndPosition-ipStartPosition);
 
     std::string currentChar;
-
-    //std::cout << strReply << std::endl;
 
     int a1,a2,a3,a4,p1,p2;
     sscanf(strReply.c_str(), "%d,%d,%d,%d,%d,%d", &a1, &a2, &a3, &a4, &p1, &p2);
@@ -162,8 +127,19 @@ int change_to_passive(std::string message) {
 
     printf("Port 1: %d\n", p1);
     printf("Port 2: %d\n", p2);
+    
+    //left shift port one by 8 bits
+    p1 <<= 8;
 
->>>>>>> origin/isaac-work-branch
+    //concatenate port one and port two
+    std::ostringstream concat;
+    concat << p1 << p2;
+    temp = concat.str();
+    std::stringstream convert(temp);
+    convert >> result;
+    printf("Concat: %d\n", result);
+    return create_connection(ip_server_dtp,  result);
+
 
     /* Pass the response retrieved from Server PI after entering PASV
      Response would be parsed and the following would be used
@@ -177,18 +153,15 @@ int change_to_passive(std::string message) {
      and recieve a reply from the new socket // reply(new_socket, ...)
 
      */
-<<<<<<< HEAD
 }
 void downloadFile(int sock_dtp, std::string fileName)
 {
     FILE * file = fopen(fileName.c_str(), "w");
     do{
-        fputs(reply(sock_dtp), file);
+        fputs(reply(sock_dtp).c_str(), file);
     }while(!feof(file));
     fclose(file);
 }
-
-
 int main(int argc , char *argv[])
 {
     int sockpi;
@@ -226,49 +199,23 @@ int main(int argc , char *argv[])
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         // Isolate status code from rest of message
         status = std::stoi(strReply.substr(0,3), &sz);
-        std::cout << strReply << std::endl;
+        //std::cout << strReply << std::endl;
         // If the password was good
         if(status == 230) {
-            //TODO implement PASV, LIST, RETR.
-            // Hint: implement a function that set the SP in passive mode and accept commands.
             strReply = request_reply(sockpi, "PASV\r\n");
             status = std::stoi(strReply.substr(0,3));
-            
-
-            
-            int sock_dtp = change_to_passive(strReply,21,21);            //A bit hacky??
-            
-
-            //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
-            //std::cout<<dtpIP;
-            
+            int sock_dtp = change_to_passive(strReply);
             std::cout << strReply << std::endl;
-            //printf("This is the string reply: %s\n", strReply.c_str());
 
-            // int sts;
-            // std::string msg;
-            // sscanf(strReply.c_str(), "%d-%s", &sts, &msg);
-            // printf("Status message: %d\n", sts);
-            status = std::stoi(strReply.substr(0,3));
-            std::cout << "status" << std::endl;  
-
-            //std::cout << "Before Comment" << std::endl;
-            int sock_dtp = change_to_passive(strReply);            //A bit hacky??
-            //std::cout << "After Comment" << std::endl;
-
-            //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
-            //std::cout<<dtpIP;
-            
             if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
-                             <<"1. List Files\n2. Retrieve a File\n3. Quit\n"
-                             <<"Enter Number: ";
                              <<"1. List Files\n"
                              <<"2. Retrieve a File\n"
                              <<"3. Quit\n"
                              <<"Make selection: ";
 
+                    // uReq starts with RETR
                     std::cin>>uReq;
 
                     switch(uReq){
@@ -278,6 +225,8 @@ int main(int argc , char *argv[])
                         if(status == 150){
                             strReply = reply(sock_dtp);
                             std::cout<<strReply<<std::endl;
+                        }else{
+                            std::cout<<"You are not be connected. Restart Application.\n";
                         }
                         std::cout<<strReply<<std::endl;
                         break;
@@ -295,10 +244,9 @@ int main(int argc , char *argv[])
                         strReply = request_reply(sockpi, "QUIT\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
                         if(status == 221)
-                            quit=1;
+                        quit=1;
                         break;
                     default:
-                        
                         std::cout<<"Invalid input. Try again.\n";
                         std::cin>>uReq;
                         break;
