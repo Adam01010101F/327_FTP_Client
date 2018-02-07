@@ -138,7 +138,8 @@ int change_to_passive(std::string message) {
     std::stringstream convert(temp);
     convert >> result;
     printf("Concat: %d\n", result);
-    return create_connection(ip_server_dtp,  result);
+
+    if(create_connection(ip_server_dtp,  result));
 
 
     /* Pass the response retrieved from Server PI after entering PASV
@@ -203,10 +204,9 @@ int main(int argc , char *argv[])
         // If the password was good
         if(status == 230) {
             strReply = request_reply(sockpi, "PASV\r\n");
-            status = std::stoi(strReply.substr(0,3));
+            status = std::stoi(strReply.substr(0,3), &sz);
             int sock_dtp = change_to_passive(strReply);
-            std::cout << strReply << std::endl;
-
+            std::cout << "Does it get here?" << std::endl;
             if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
@@ -231,7 +231,7 @@ int main(int argc , char *argv[])
                         std::cout<<strReply<<std::endl;
                         break;
                     case 2:
-                        std::cout<<"FILENAME: ";
+                        std::cout<<"Enter whole filename: ";
                         std::cin>>fileName;
                         strReply = request_reply(sockpi, "RETR"+fileName+"\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
