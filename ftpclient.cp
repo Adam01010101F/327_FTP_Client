@@ -146,13 +146,20 @@ int change_to_passive(std::string strReply, int port_one, int port_two) {
 
      */
 }
+void downloadFile(int sock_dtp, std::string fileName)
+{
+
+    FILE * file = fopen("filename", "r");
+    
+}
+
 
 int main(int argc , char *argv[])
 {
     int sockpi;
     // This should be changed, make them one for each var
     int quit, uReq, status = 0;
-    std::string strReply; 
+    std::string strReply, fileName; 
     std::string::size_type sz;
 
     std::string default_ip = "130.179.16.134";
@@ -193,9 +200,9 @@ int main(int argc , char *argv[])
             status = std::stoi(strReply.substr(0,3));
             
 
-            std::cout << "Before Comment" << std::endl;
-            //int sock_dtp = change_to_passive(strReply,21,21);            //A bit hacky??
-            std::cout << "After Comment" << std::endl;
+            
+            int sock_dtp = change_to_passive(strReply,21,21);            //A bit hacky??
+            
 
             //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
             //std::cout<<dtpIP;
@@ -208,14 +215,23 @@ int main(int argc , char *argv[])
 
                     switch(uReq){
                     case 1:
-
-                        // strReply = request_reply(sockpi, "LIST\r\n");
-                        // status = std::stoi(strReply.substr(0,3), &sz);
-                        // std::cout<<strReply<<std::endl;
+                        strReply = request_reply(sockpi, "LIST\r\n");
+                        status = std::stoi(strReply.substr(0,3), &sz);
+                        if(status == 150){
+                            strReply = reply(sock_dtp);
+                            std::cout<<strReply<<std::endl;
+                        }
+                        std::cout<<strReply<<std::endl;
                         break;
                     case 2:
-                        strReply = request_reply(sockpi, uReq+"\r\n");
+                        std::cout<<"FILENAME: ";
+                        std::cin>>fileName;
+                        strReply = request_reply(sockpi, "RETR"+fileName+"\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
+                        if(status == 150)
+                        {  
+                            downloadFile(sock_dtp, fileName);
+                        }
                         break;
                     case 3:
                         quit=1;
