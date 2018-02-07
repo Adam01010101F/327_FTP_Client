@@ -108,16 +108,23 @@ int change_to_passive(std::string message) {
     std::string strReply = message.substr(ipStartPosition, ipEndPosition-ipStartPosition);
 
     std::string currentChar;
-    // Convert comma-delimited ip to a period-delimited ip
-    for (int i = 0; i < strReply.length()-1; ++i)
-    {
-        currentChar = strReply.substr(i,1);
-        if(currentChar == ","){
-            strReply.replace(i,1,".");
-        }
-    }
 
-    std::cout << strReply << std::endl;
+    //std::cout << strReply << std::endl;
+
+    int a1,a2,a3,a4,p1,p2;
+    sscanf(strReply.c_str(), "%d,%d,%d,%d,%d,%d", &a1, &a2, &a3, &a4, &p1, &p2);
+    //printf("This is the ip address: %d.%d.%d.%d Here is port 1: %d and here is port 2: %d\n", a1,a2,a3,a4,p1,p2);
+
+    std::string ip_server_dtp = std::to_string(a1) + "." + std::to_string(a2) + "." + std::to_string(a3) + "." + std::to_string(a4);
+
+    // std::string port1 = std::to_string(p1);
+    // std::string port2 = std::to_string(p2);
+
+    printf("IP Address: %s\n", ip_server_dtp.c_str());
+
+    printf("Port 1: %d\n", p1);
+    printf("Port 2: %d\n", p2);
+
 
     /* Pass the response retrieved from Server PI after entering PASV
      Response would be parsed and the following would be used
@@ -170,20 +177,30 @@ int main(int argc , char *argv[])
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         // Isolate status code from rest of message
         status = std::stoi(strReply.substr(0,3), &sz);
-        std::cout << strReply << std::endl;
+        //std::cout << strReply << std::endl;
         // If the password was good
         if(status == 230) {
             //TODO implement PASV, LIST, RETR.
             // Hint: implement a function that set the SP in passive mode and accept commands.
             strReply = request_reply(sockpi, "PASV\r\n");
-            status = std::stoi(strReply.substr(0,3));
+            
+            std::cout << strReply << std::endl;
+            //printf("This is the string reply: %s\n", strReply.c_str());
 
-            std::cout << "Before Comment" << std::endl;
+            // int sts;
+            // std::string msg;
+            // sscanf(strReply.c_str(), "%d-%s", &sts, &msg);
+            // printf("Status message: %d\n", sts);
+            status = std::stoi(strReply.substr(0,3));
+            std::cout << "status" << std::endl;  
+
+            //std::cout << "Before Comment" << std::endl;
             int sock_dtp = change_to_passive(strReply);            //A bit hacky??
-            std::cout << "After Comment" << std::endl;
+            //std::cout << "After Comment" << std::endl;
 
             //std::string dtpIP = std::stoi(strReply.substr(30,50), &sz);
             //std::cout<<dtpIP;
+            
             if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
