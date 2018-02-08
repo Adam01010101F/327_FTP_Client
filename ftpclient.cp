@@ -161,7 +161,7 @@ int change_to_passive(std::string message) {
 }
 void downloadFile(int sock_dtp, std::string fileName)
 {
-    FILE * file = fopen(fileName.c_str(), "w");
+    FILE * file = fopen(fileName.c_str(), "wb");
     do{
         fputs(reply(sock_dtp).c_str(), file);
     }while(!feof(file));
@@ -241,8 +241,10 @@ int main(int argc , char *argv[])
                     case 2: {
                         std::cout<<"Enter whole filename: ";
                         std::cin>>fileName;
-                        strReply = request_reply(sockpi, "RETR"+fileName+"\r\n");
+                        strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
+                        std::cout << "RETR status: ";
+                        std::cout << status << std::endl;
                         if(status == 150)
                         {  
                             downloadFile(sock_dtp, fileName);
