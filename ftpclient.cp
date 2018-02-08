@@ -99,9 +99,9 @@ std::string request_reply(int s, std::string message)
 	return "";
 }
 
-bool isDone(std::string sockPI){
+// bool isDone(std::string sockPI){
     
-}
+// }
 
 int change_to_passive(std::string message) {
     int passiveID=0, changes=0, result = 0;
@@ -225,23 +225,20 @@ int main(int argc , char *argv[])
                     std::cin>>uReq;
 
                     switch(uReq){
-                    case 1:
-                        request(sockpi, "LIST\r\n");
-                        strReply = reply(sock_dtp);
+                    case 1:{
+                        
+                        strReply = request_reply(sockpi, "LIST\r\n");
+                        status = std::stoi(strReply.substr(0,3), &sz);
 
-
-                        //strReply = request(sockpi, "LIST\r\n");
-                        //std::cout << strReply << std::endl;
-                        //status = std::stoi(strReply.substr(0,3), &sz);
                         if(status == 150){
                             strReply = reply(sock_dtp);
                             std::cout<<strReply<<std::endl;
                         }else{
                             std::cout<<"You are not be connected. Restart Application.\n";
                         }
-                        std::cout<<strReply<<std::endl;
                         break;
-                    case 2:
+                        }
+                    case 2: {
                         std::cout<<"Enter whole filename: ";
                         std::cin>>fileName;
                         strReply = request_reply(sockpi, "RETR"+fileName+"\r\n");
@@ -251,16 +248,19 @@ int main(int argc , char *argv[])
                             downloadFile(sock_dtp, fileName);
                         }
                         break;
-                    case 3:
+                        }
+                    case 3: {
                         strReply = request_reply(sockpi, "QUIT\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
                         if(status == 221)
                         quit=1;
                         break;
-                    default:
+                        }
+                    default: {
                         std::cout<<"Invalid input. Try again.\n";
                         std::cin>>uReq;
                         break;
+                        }
                     }
                 }
             }else{
