@@ -98,6 +98,7 @@ std::string request_reply(int s, std::string message)
 	}
 	return "";
 }
+
 bool isDone(std::string sockPI){
     
 }
@@ -127,6 +128,9 @@ int change_to_passive(std::string message) {
 
     printf("Port 1: %d\n", p1);
     printf("Port 2: %d\n", p2);
+
+    int test_num = p1*256+p2;
+    printf("Hello: %d\n", test_num);
     
     //left shift port one by 8 bits
     p1 <<= 8;
@@ -139,8 +143,8 @@ int change_to_passive(std::string message) {
     convert >> result;
     printf("Concat: %d\n", result);
 
-    if(create_connection(ip_server_dtp,  result));
-
+    int sock_dtp = create_connection(ip_server_dtp,  test_num);
+    return sock_dtp;
 
     /* Pass the response retrieved from Server PI after entering PASV
      Response would be parsed and the following would be used
@@ -206,7 +210,9 @@ int main(int argc , char *argv[])
             strReply = request_reply(sockpi, "PASV\r\n");
             status = std::stoi(strReply.substr(0,3), &sz);
             int sock_dtp = change_to_passive(strReply);
-            std::cout << "Does it get here?" << std::endl;
+            std::cout << "Before" << std::endl;
+            std::cout << sock_dtp << std::endl;
+            std::cout << "After" << std::endl;
             if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
@@ -220,8 +226,13 @@ int main(int argc , char *argv[])
 
                     switch(uReq){
                     case 1:
-                        strReply = request_reply(sockpi, "LIST\r\n");
-                        status = std::stoi(strReply.substr(0,3), &sz);
+                        request(sockpi, "LIST\r\n");
+                        strReply = reply(sock_dtp);
+
+
+                        //strReply = request(sockpi, "LIST\r\n");
+                        std::cout << strReply << std::endl;
+                        //status = std::stoi(strReply.substr(0,3), &sz);
                         if(status == 150){
                             strReply = reply(sock_dtp);
                             std::cout<<strReply<<std::endl;
