@@ -98,13 +98,17 @@ std::string request_reply(int s, std::string message)
 	}
 	return "";
 }
+<<<<<<< Updated upstream
 
 // bool isDone(std::string sockPI){
     
 // }
+=======
+>>>>>>> Stashed changes
 
 int change_to_passive(std::string message) {
-    int passiveID=0, changes=0, result = 0;
+    int passiveID=0, changes=0, result = 0, a1, a2, a3, a4, p1, p2;
+;
     std::string temp;
     size_t pos;
 
@@ -115,7 +119,6 @@ int change_to_passive(std::string message) {
 
     std::string currentChar;
 
-    int a1,a2,a3,a4,p1,p2;
     sscanf(strReply.c_str(), "%d,%d,%d,%d,%d,%d", &a1, &a2, &a3, &a4, &p1, &p2);
     //printf("This is the ip address: %d.%d.%d.%d Here is port 1: %d and here is port 2: %d\n", a1,a2,a3,a4,p1,p2);
 
@@ -133,18 +136,25 @@ int change_to_passive(std::string message) {
     printf("Hello: %d\n", test_num);
     
     //left shift port one by 8 bits
-    p1 <<= 8;
+    //p1 <<= 8;
 
     //concatenate port one and port two
-    std::ostringstream concat;
-    concat << p1 << p2;
-    temp = concat.str();
-    std::stringstream convert(temp);
-    convert >> result;
+    // std::ostringstream concat;
+    // concat << p1 << p2;
+    // temp = concat.str();
+    // std::stringstream convert(temp);
+    // convert >> result;
+    // 
+    result = p1*256 + p2;
     printf("Concat: %d\n", result);
+<<<<<<< Updated upstream
 
     int sock_dtp = create_connection(ip_server_dtp,  test_num);
     return sock_dtp;
+=======
+    return create_connection(ip_server_dtp,  result);
+
+>>>>>>> Stashed changes
 
     /* Pass the response retrieved from Server PI after entering PASV
      Response would be parsed and the following would be used
@@ -162,9 +172,13 @@ int change_to_passive(std::string message) {
 void downloadFile(int sock_dtp, std::string fileName)
 {
     FILE * file = fopen(fileName.c_str(), "wb");
+    
+    FILE * file = fopen(fileName.c_str(), "w");
     do{
         fputs(reply(sock_dtp).c_str(), file);
     }while(!feof(file));
+        std::cout<<"Downloading a chunk\n";
+    }while(feof(file));
     fclose(file);
 }
 int main(int argc , char *argv[])
@@ -172,6 +186,7 @@ int main(int argc , char *argv[])
     int sockpi;
     // This should be changed, make them one for each var
     int quit, uReq, status = 0;
+    int quit=0, uReq, status = 0;
     std::string strReply, fileName; 
     std::string::size_type sz;
 
@@ -216,12 +231,19 @@ int main(int argc , char *argv[])
             if(status==227){   //Entered Passive Mode
                 while(quit==0){
                     std::cout<<"\t\t\tMAIN MENU\n"
+=======
+            while(quit==0){
+                strReply = request_reply(sockpi, "PASV\r\n");
+                status = std::stoi(strReply.substr(0,3), &sz);
+                std::cout << strReply << std::endl;
+                int sock_dtp = change_to_passive(strReply);
+                if(status==227){   //Entered Passive Mode
+                     std::cout<<"\t\t\tMAIN MENU\n"
+>>>>>>> Stashed changes
                              <<"1. List Files\n"
                              <<"2. Retrieve a File\n"
                              <<"3. Quit\n"
                              <<"Make selection: ";
-
-                    // uReq starts with RETR
                     std::cin>>uReq;
 
                     switch(uReq){
@@ -241,21 +263,40 @@ int main(int argc , char *argv[])
                     case 2: {
                         std::cout<<"Enter whole filename: ";
                         std::cin>>fileName;
+<<<<<<< Updated upstream
                         strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
                         std::cout << "RETR status: ";
                         std::cout << status << std::endl;
                         if(status == 150)
                         {  
+=======
+                        std::cout<<"RETR "+fileName+"\r\n";
+                        strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
+                        status = std::stoi(strReply.substr(0,3), &sz);
+                        if(status == 150){
+>>>>>>> Stashed changes
                             downloadFile(sock_dtp, fileName);
+                        } else {
+                            std::cout<<"Something went wrong. Restart Application.\n";
                         }
+<<<<<<< Updated upstream
                         break;
                         }
                     case 3: {
+=======
+                        if(status == 226){
+                            std::<<"Transmission Finished."<<std::endl;
+                            break;
+                        }
+                        
+                    case 3:
+>>>>>>> Stashed changes
                         strReply = request_reply(sockpi, "QUIT\r\n");
                         status = std::stoi(strReply.substr(0,3), &sz);
+                        std::cout<<strReply<<std::endl;
                         if(status == 221)
-                        quit=1;
+                            quit=1;
                         break;
                         }
                     default: {
