@@ -231,7 +231,7 @@ int main(int argc , char *argv[])
 
 
                         //strReply = request(sockpi, "LIST\r\n");
-                        std::cout << strReply << std::endl;
+                        //std::cout << strReply << std::endl;
                         //status = std::stoi(strReply.substr(0,3), &sz);
                         if(status == 150){
                             strReply = reply(sock_dtp);
