@@ -29,6 +29,10 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 #include <unistd.h>
 #include <netdb.h>
 #include <sstream>
+#include <fstream>
+#include <string>
+#include <iostream>
+
 #define BUFFER_LENGTH 2048
 #define WAITING_TIME 150000
 
@@ -99,7 +103,7 @@ std::string request_reply(int s, std::string message)
 	return "";
 }
 
-// bool isDone(std::string sockPI){
+// bool isDone(std::string sockpi){
     
 // }
 
@@ -124,13 +128,13 @@ int change_to_passive(std::string message) {
     // std::string port1 = std::to_string(p1);
     // std::string port2 = std::to_string(p2);
 
-    printf("IP Address: %s\n", ip_server_dtp.c_str());
+    // printf("IP Address: %s\n", ip_server_dtp.c_str());
 
-    printf("Port 1: %d\n", p1);
-    printf("Port 2: %d\n", p2);
+    // printf("Port 1: %d\n", p1);
+    // printf("Port 2: %d\n", p2);
 
     int test_num = p1*256+p2;
-    printf("Hello: %d\n", test_num);
+    // printf("Hello: %d\n", test_num);
     
     //left shift port one by 8 bits
     p1 <<= 8;
@@ -141,7 +145,7 @@ int change_to_passive(std::string message) {
     temp = concat.str();
     std::stringstream convert(temp);
     convert >> result;
-    printf("Concat: %d\n", result);
+    // printf("Concat: %d\n", result);
 
     int sock_dtp = create_connection(ip_server_dtp,  test_num);
     return sock_dtp;
@@ -152,7 +156,7 @@ int change_to_passive(std::string message) {
      2. (2) ports that need to concatenate
 
      Then use the new ip address to create a new connection
-     this will give us a new sockPI
+     this will give us a new sockpi
      
      At this point we will likely request from the orignial socket // request(orig_socket, ...)
      and recieve a reply from the new socket // reply(new_socket, ...)
@@ -161,17 +165,18 @@ int change_to_passive(std::string message) {
 }
 void downloadFile(int sock_dtp, std::string fileName)
 {
-    FILE * file = fopen(fileName.c_str(), "wb");
-    do{
-        fputs(reply(sock_dtp).c_str(), file);
-    }while(!feof(file));
-    fclose(file);
+    //FILE * file = fopen(fileName.c_str(), "wb");
+
+    std::ofstream file("filename.text");
+    std::string my_string = "Hello text in file\n";
+    file << my_string;
 }
 int main(int argc , char *argv[])
 {
     int sockpi;
     // This should be changed, make them one for each var
-    int quit, uReq, status = 0;
+    int quit, uReq = 0;
+    std::string status;
     std::string strReply, fileName; 
     std::string::size_type sz;
 
@@ -196,25 +201,25 @@ int main(int argc , char *argv[])
     // Send user info to the server and print out the response
     strReply = request_reply(sockpi, "USER anonymous\r\n");
     // Isolates the status code from the rest of the message 
-    status = std::stoi(strReply.substr(0,3), &sz);
+    status = strReply.substr(0,3);
     std::cout << strReply << std::endl;
     // If user is valid/ If status code is 331
-    if(status == 331) {
+    if(status == "331") {
         // Send password to server and ask for code
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         // Isolate status code from rest of message
-        status = std::stoi(strReply.substr(0,3), &sz);
+        status = strReply.substr(0,3);
         //std::cout << strReply << std::endl;
         // If the password was good
-        if(status == 230) {
-            strReply = request_reply(sockpi, "PASV\r\n");
-            status = std::stoi(strReply.substr(0,3), &sz);
-            int sock_dtp = change_to_passive(strReply);
-            std::cout << "Before" << std::endl;
-            std::cout << sock_dtp << std::endl;
-            std::cout << "After" << std::endl;
-            if(status==227){   //Entered Passive Mode
+        if(status == "230") {
+            
+  
+            if(true){   //Entered Passive Mode
                 while(quit==0){
+                    strReply = request_reply(sockpi, "PASV\r\n");
+                    status = strReply.substr(0,3);
+                    int sock_dtp = change_to_passive(strReply);
+                    
                     std::cout<<"\t\t\tMAIN MENU\n"
                              <<"1. List Files\n"
                              <<"2. Retrieve a File\n"
@@ -226,35 +231,48 @@ int main(int argc , char *argv[])
 
                     switch(uReq){
                     case 1:{
-                        
-                        strReply = request_reply(sockpi, "LIST\r\n");
-                        status = std::stoi(strReply.substr(0,3), &sz);
 
-                        if(status == 150){
+                        strReply = request_reply(sockpi, "LIST\r\n");
+                        status = strReply.substr(0,3);
+                        //std::cout << "This is the status: " << status << std::endl;
+
+                        if(status == "150"){
                             strReply = reply(sock_dtp);
                             std::cout<<strReply<<std::endl;
                         }else{
                             std::cout<<"You are not be connected. Restart Application.\n";
                         }
+                        close(sock_dtp);
+                        std::string test = reply(sockpi);
+                        //std::cout << test << std::endl;
                         break;
+
                         }
                     case 2: {
                         std::cout<<"Enter whole filename: ";
                         std::cin>>fileName;
                         strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
-                        status = std::stoi(strReply.substr(0,3), &sz);
+                        status = strReply.substr(0,3);
                         std::cout << "RETR status: ";
                         std::cout << status << std::endl;
-                        if(status == 150)
+                        if(status == "150")
                         {  
-                            downloadFile(sock_dtp, fileName);
+                            strReply = reply(sock_dtp);
+                            //std::cout << strReply << std::endl;
                         }
+                        std::ofstream out(fileName);
+                        out << strReply;
+                        out.close();
+                        close(sock_dtp);
+                        std::cout << reply(sockpi) << std::endl;
                         break;
                         }
                     case 3: {
+                        
                         strReply = request_reply(sockpi, "QUIT\r\n");
-                        status = std::stoi(strReply.substr(0,3), &sz);
-                        if(status == 221)
+                        status = strReply.substr(0,3);
+                        if(status == "221")
+                        close(sockpi);
                         quit=1;
                         break;
                         }
