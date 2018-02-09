@@ -42,6 +42,9 @@ const std::string passID = "230";
 const std::string pasvID = "227";
 const std::string listrtID = "150";
 const std::string quitID = "221";
+const std::string closeID = "226";
+const std::string cwdSuccess = "250";
+
 
 int create_connection(std::string host, int port)
 {
@@ -137,6 +140,29 @@ void downloadFile(int sock_dtp, std::string fileName)
     std::string my_string = "Hello text in file\n";
     file << my_string;
 }
+
+void list_dir(int sockpi, int sock_dtp){
+    // Send message to Server PI , LIST. Then parse response
+    std::string strReply = request_reply(sockpi, "LIST\r\n");
+    std::string status = strReply.substr(0,3);
+
+    // If response was success code then seek reply from Server DTP
+    if(status == "150"){
+        strReply = reply(sock_dtp);
+        std::cout<<strReply<<std::endl;
+    }else{
+    // If response code was not success then inform user
+        std::cout<<"You are not be connected. Restart Application.\n";
+    }
+    // Closes the socket in order to avoid program hang, then looks for completion code
+    close(sock_dtp);
+    std::string test = reply(sockpi);
+    if (test == closeID)
+    {
+        std::cout << "Success! Connection closed." << std::endl;
+    }
+}
+
 int main(int argc , char *argv[])
 {
     int sockpi;
@@ -188,38 +214,37 @@ int main(int argc , char *argv[])
                     
                     std::cout<<"///////////MAIN MENU///////////\n"
                              <<"1. List Files\n"
-                             <<"2. Retrieve a File\n"
                              <<"3. Change Directory\n"
+                             <<"2. Retrieve a File\n"
                              <<"4. Quit\n"
                              <<"///////////////////////////////\n";
                              
 
                     // uReq starts with RETR
-                    std::cout << "Make selection: " << std::endl;
+                    std::cout << "Make selection: ";
                     std::cin >>uReq;
+                    std::cout << std::endl;
+                    
                     switch(uReq){
                     case 1:{
-
-                        strReply = request_reply(sockpi, "LIST\r\n");
-                        status = strReply.substr(0,3);
-                        //std::cout << "This is the status: " << status << std::endl;
-
-                        if(status == "150"){
-                            strReply = reply(sock_dtp);
-                            std::cout<<strReply<<std::endl;
-                        }else{
-                            std::cout<<"You are not be connected. Restart Application.\n";
-                        }
-                        close(sock_dtp);
-                        std::string test = reply(sockpi);
-                        //std::cout << test << std::endl;
+                        list_dir(sockpi, sock_dtp);
                         break;
 
                         }
                     case 2: {
                         std::string dir_name;
-                        std::cin>>dir_name;
+                        std::cout << "Enter name of directory: ";
+                        std::cin >> dir_name;
+                        std::cout << std::endl;
                         strReply = request_reply(sockpi, "CWD "+dir_name+"\r\n");
+                        // std::cout << strReply << std::endl;
+                        
+                        status = strReply.substr(0,3);
+                        if (status == cwdSuccess)
+                        {
+                            list_dir(sockpi, sock_dtp);
+                        }
+                        
                         break;
                     }
                     case 3: {
