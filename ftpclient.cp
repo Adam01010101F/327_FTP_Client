@@ -220,8 +220,7 @@ int main(int argc , char *argv[])
                     while(std::cin.fail()||uReq>4||uReq<=0){
                         std::cout<<"Enter a valid number (1-4): ";
                         std::cin.clear();
-                        std::cin.ignore();
-                        std::cin.ignore();
+                        std::cin.ignore(10000, '\n');
                         std::cin>>uReq;
                     }
                     switch(uReq){
