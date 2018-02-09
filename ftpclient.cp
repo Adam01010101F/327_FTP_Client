@@ -36,12 +36,12 @@ iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 #define BUFFER_LENGTH 2048
 #define WAITING_TIME 150000
 
-const int connectID = 220;
-const int userID = 331;
-const int passID = 230;
-const int pasvID = 227;
-const int listrtID = 150;
-const int quitID = 221;
+const std::string connectID = "220";
+const std::string userID = "331";
+const std::string passID = "230";
+const std::string pasvID = "227";
+const std::string listrtID = "150";
+const std::string quitID = "221";
 
 int create_connection(std::string host, int port)
 {
@@ -56,7 +56,7 @@ int create_connection(std::string host, int port)
     int a1,a2,a3,a4;
     if (sscanf(host.c_str(), "%d.%d.%d.%d", &a1, &a2, &a3, &a4 ) == 4)
     {
-        std::cout << "by ip";
+        //std::cout << "by ip";
         socketAddress.sin_addr.s_addr =  inet_addr(host.c_str());
     }
     else {
@@ -121,47 +121,13 @@ int change_to_passive(std::string message) {
 
     int a1,a2,a3,a4,p1,p2;
     sscanf(strReply.c_str(), "%d,%d,%d,%d,%d,%d", &a1, &a2, &a3, &a4, &p1, &p2);
-    //printf("This is the ip address: %d.%d.%d.%d Here is port 1: %d and here is port 2: %d\n", a1,a2,a3,a4,p1,p2);
 
     std::string ip_server_dtp = std::to_string(a1) + "." + std::to_string(a2) + "." + std::to_string(a3) + "." + std::to_string(a4);
 
-    // std::string port1 = std::to_string(p1);
-    // std::string port2 = std::to_string(p2);
-
-    // printf("IP Address: %s\n", ip_server_dtp.c_str());
-
-    // printf("Port 1: %d\n", p1);
-    // printf("Port 2: %d\n", p2);
-
     int test_num = p1*256+p2;
-    // printf("Hello: %d\n", test_num);
-    
-    //left shift port one by 8 bits
-    p1 <<= 8;
-
-    //concatenate port one and port two
-    std::ostringstream concat;
-    concat << p1 << p2;
-    temp = concat.str();
-    std::stringstream convert(temp);
-    convert >> result;
-    // printf("Concat: %d\n", result);
 
     int sock_dtp = create_connection(ip_server_dtp,  test_num);
     return sock_dtp;
-
-    /* Pass the response retrieved from Server PI after entering PASV
-     Response would be parsed and the following would be used
-     1. New IP Address
-     2. (2) ports that need to concatenate
-
-     Then use the new ip address to create a new connection
-     this will give us a new sockpi
-     
-     At this point we will likely request from the orignial socket // request(orig_socket, ...)
-     and recieve a reply from the new socket // reply(new_socket, ...)
-
-     */
 }
 void downloadFile(int sock_dtp, std::string fileName)
 {
@@ -246,41 +212,45 @@ int main(int argc , char *argv[])
                     //std::cout << test << std::endl;
                     break;
 
-                    }
-                case 2: {
-                    std::cout<<"Enter whole filename: ";
-                    std::cin>>fileName;
-                    strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
-                    status = strReply.substr(0,3);
-                    std::cout << "RETR status: ";
-                    std::cout << status << std::endl;
-                    if(status == "150")
-                    {  
-                        strReply = reply(sock_dtp);
-                    } else if(status == "550"){
-                        std::cout<<"Invalid File Name. Try Again\n\n";
+                        }
+                    case 2: {
+                        std::string dir_name;
+                        std::cin>>dir_name;
+                        strReply = request_reply(sockpi, "CWD "+dir_name+"\r\n");
                         break;
                     }
-                    std::ofstream out(fileName);
-                    out << strReply;
-                    out.close();
-                    close(sock_dtp);
-                    std::cout << reply(sockpi) << std::endl;
-                    break;
-                    }
-                case 3: {
-                    
-                    strReply = request_reply(sockpi, "QUIT\r\n");
-                    status = strReply.substr(0,3);
-                    if(status == "221")
-                    close(sockpi);
-                    quit=1;
-                    break;
-                    }
-                default: {
-                    std::cout<<"Invalid input. Try again.\n";
-                    std::cin>>uReq;
-                    break;
+                    case 3: {
+                        std::cout<<"Enter whole filename: ";
+                        std::cin>>fileName;
+                        strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
+                        status = strReply.substr(0,3);
+                        std::cout << "RETR status: ";
+                        std::cout << status << std::endl;
+                        if(status == "150")
+                        {  
+                            strReply = reply(sock_dtp);
+                            //std::cout << strReply << std::endl;
+                        }
+                        std::ofstream out(fileName);
+                        out << strReply;
+                        out.close();
+                        close(sock_dtp);
+                        std::cout << reply(sockpi) << std::endl;
+                        break;
+                        }
+                    case 4: {
+                        
+                        strReply = request_reply(sockpi, "QUIT\r\n");
+                        status = strReply.substr(0,3);
+                        if(status == "221")
+                        close(sockpi);
+                        quit=1;
+                        break;
+                        }
+                    default: {
+                        std::cout<<"Invalid input. Try again.\n";
+                        std::cin>>uReq;
+                        break;
                     }
                 }
             }
