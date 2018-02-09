@@ -209,84 +209,81 @@ int main(int argc , char *argv[])
         strReply = request_reply(sockpi, "PASS asa@asas.com\r\n");
         // Isolate status code from rest of message
         status = strReply.substr(0,3);
-        //std::cout << strReply << std::endl;
         // If the password was good
         if(status == "230") {
-            
-  
-            if(true){   //Entered Passive Mode
-                while(quit==0){
-                    strReply = request_reply(sockpi, "PASV\r\n");
-                    status = strReply.substr(0,3);
-                    int sock_dtp = change_to_passive(strReply);
+            while(quit==0){
+                strReply = request_reply(sockpi, "PASV\r\n");
+                status = strReply.substr(0,3);
+                int sock_dtp = change_to_passive(strReply);
                     
-                    std::cout<<"\t\t\tMAIN MENU\n"
-                             <<"1. List Files\n"
-                             <<"2. Retrieve a File\n"
-                             <<"3. Quit\n"
-                             <<"Make selection: ";
-
-                    // uReq starts with RETR
+                std::cout<<"\t\t\tMAIN MENU\n"
+                        <<"1. List Files\n"
+                        <<"2. Retrieve a File\n"
+                        <<"3. Quit\n"
+                        <<"Make selection: ";
+                std::cin>>uReq;
+                while(std::cin.fail()||uReq>4){
+                    std::cout<<"Enter a valid number (1-4): ";
+                    std::cin.clear();
+                    std::cin.ignore();
                     std::cin>>uReq;
+                }
+                switch(uReq){
+                case 1:{
 
-                    switch(uReq){
-                    case 1:{
+                    strReply = request_reply(sockpi, "LIST\r\n");
+                    status = strReply.substr(0,3);
+                    //std::cout << "This is the status: " << status << std::endl;
 
-                        strReply = request_reply(sockpi, "LIST\r\n");
-                        status = strReply.substr(0,3);
-                        //std::cout << "This is the status: " << status << std::endl;
+                    if(status == "150"){
+                        strReply = reply(sock_dtp);
+                        std::cout<<strReply<<std::endl;
+                    }else{
+                        std::cout<<"You are not be connected. Restart Application.\n";
+                    }
+                    close(sock_dtp);
+                    std::string test = reply(sockpi);
+                    //std::cout << test << std::endl;
+                    break;
 
-                        if(status == "150"){
-                            strReply = reply(sock_dtp);
-                            std::cout<<strReply<<std::endl;
-                        }else{
-                            std::cout<<"You are not be connected. Restart Application.\n";
-                        }
-                        close(sock_dtp);
-                        std::string test = reply(sockpi);
-                        //std::cout << test << std::endl;
+                    }
+                case 2: {
+                    std::cout<<"Enter whole filename: ";
+                    std::cin>>fileName;
+                    strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
+                    status = strReply.substr(0,3);
+                    std::cout << "RETR status: ";
+                    std::cout << status << std::endl;
+                    if(status == "150")
+                    {  
+                        strReply = reply(sock_dtp);
+                    } else if(status == "550"){
+                        std::cout<<"Invalid File Name. Try Again\n\n";
                         break;
-
-                        }
-                    case 2: {
-                        std::cout<<"Enter whole filename: ";
-                        std::cin>>fileName;
-                        strReply = request_reply(sockpi, "RETR "+fileName+"\r\n");
-                        status = strReply.substr(0,3);
-                        std::cout << "RETR status: ";
-                        std::cout << status << std::endl;
-                        if(status == "150")
-                        {  
-                            strReply = reply(sock_dtp);
-                            //std::cout << strReply << std::endl;
-                        }
-                        std::ofstream out(fileName);
-                        out << strReply;
-                        out.close();
-                        close(sock_dtp);
-                        std::cout << reply(sockpi) << std::endl;
-                        break;
-                        }
-                    case 3: {
-                        
-                        strReply = request_reply(sockpi, "QUIT\r\n");
-                        status = strReply.substr(0,3);
-                        if(status == "221")
-                        close(sockpi);
-                        quit=1;
-                        break;
-                        }
-                    default: {
-                        std::cout<<"Invalid input. Try again.\n";
-                        std::cin>>uReq;
-                        break;
-                        }
+                    }
+                    std::ofstream out(fileName);
+                    out << strReply;
+                    out.close();
+                    close(sock_dtp);
+                    std::cout << reply(sockpi) << std::endl;
+                    break;
+                    }
+                case 3: {
+                    
+                    strReply = request_reply(sockpi, "QUIT\r\n");
+                    status = strReply.substr(0,3);
+                    if(status == "221")
+                    close(sockpi);
+                    quit=1;
+                    break;
+                    }
+                default: {
+                    std::cout<<"Invalid input. Try again.\n";
+                    std::cin>>uReq;
+                    break;
                     }
                 }
-            }else{
-                std::cout<<"Connnection Failed."<<std::endl;
             }
-
         }else {
             std::cout << "Invalid Password" << std::endl;
         }
