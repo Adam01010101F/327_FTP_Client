@@ -184,8 +184,9 @@ int main(int argc , char *argv[])
                     
                 std::cout<<"\t\t\tMAIN MENU\n"
                         <<"1. List Files\n"
-                        <<"2. Retrieve a File\n"
-                        <<"3. Quit\n"
+                        <<"2. Change Directory\n"
+                        <<"3. Retrieve a File\n"
+                        <<"4. Quit\n"
                         <<"Make selection: ";
                 std::cin>>uReq;
                 while(std::cin.fail()||uReq>4){
@@ -214,6 +215,7 @@ int main(int argc , char *argv[])
 
                         }
                     case 2: {
+                        std::cout<<"Enter a directory ('..' to go back): \n";
                         std::string dir_name;
                         std::cin>>dir_name;
                         strReply = request_reply(sockpi, "CWD "+dir_name+"\r\n");
@@ -230,6 +232,9 @@ int main(int argc , char *argv[])
                         {  
                             strReply = reply(sock_dtp);
                             //std::cout << strReply << std::endl;
+                        } else if(status == "550"){
+                            std::cout<<"Invalid filename.\n";
+                            break;
                         }
                         std::ofstream out(fileName);
                         out << strReply;
