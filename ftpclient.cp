@@ -242,6 +242,8 @@ int main(int argc , char *argv[])
                         if (status == cwdSuccess)
                         {
                             list_dir(sockpi, sock_dtp);
+                        }else{
+                            std::cout << "Can't find that directory." << std::endl;
                         }
                         
                         break;
