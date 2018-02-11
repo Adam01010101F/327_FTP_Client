@@ -159,12 +159,13 @@ int change_to_passive(std::string message) {
 
      */
 }
+
 void downloadFile(int sock_dtp, std::string fileName)
 {
     FILE * file = fopen(fileName.c_str(), "wb");
     do{
         fputs(reply(sock_dtp).c_str(), file);
-    }while(!feof(file));
+    }while(feof(file));
     fclose(file);
 }
 int main(int argc , char *argv[])
